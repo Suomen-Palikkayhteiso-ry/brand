@@ -28,7 +28,7 @@ SQUARE_WEBP_FILES = $(patsubst %.svg, $(SQUARE_PNG_DIR)/%.webp, $(SQUARE_SOURCE_
 
 # Default target
 .PHONY: all
-all: outlined png webp
+all: outlined png webp brick
 
 # Generate outlined SVG versions
 .PHONY: outlined
@@ -105,7 +105,7 @@ $(SQUARE_PNG_DIR)/%.webp: $(SQUARE_PNG_DIR)/%.png
 
 # Clean generated files
 .PHONY: clean
-clean:
+clean: clean-brick
 	@echo "Cleaning generated files..."
 	@rm -f $(HORIZONTAL_OUTLINED_SVGS)
 	@rm -f $(HORIZONTAL_PNG_FILES)
@@ -163,85 +163,70 @@ status:
 # BRICK-STYLE LOGO GENERATION
 # ============================================================================
 # Generates blocky/pixelated brick-style versions of outlined logos
-# Brick dimensions follow real LEGO proportions: 0.6" × 0.5" (width × height)
+# Brick dimensions follow real proportions: 0.6" × 0.5" (width × height)
 #   - 2×2 bricks: 24px wide × 20px high
 #   - 1×1 bricks: 12px wide × 20px high
 #   - auto mode: Uses both sizes adaptively for optimal appearance
-
-NIX_PYTHON := nix-shell -p python3 python312Packages.pillow python312Packages.cairosvg --run
-BLOCKIFY := $(NIX_PYTHON) "python brick_blockify.py
-BLOCKIFY_FULL := $(NIX_PYTHON) "python brick_blockify_full.py
 
 # Brick output directories
 HORIZONTAL_BRICK_DIR = $(HORIZONTAL_OUTLINED_DIR)/brick
 SQUARE_BRICK_DIR = $(SQUARE_OUTLINED_DIR)/brick
 
-# Square brick logos (from outlined versions, 20px pixel width)
-SQUARE_OUTLINED_FOR_BRICK = $(wildcard $(SQUARE_OUTLINED_DIR)/spy-logo-square-outlined-*.svg)
-SQUARE_BRICK_LOGOS = $(patsubst $(SQUARE_OUTLINED_DIR)/%.svg,$(SQUARE_BRICK_DIR)/%-brick.svg,$(SQUARE_OUTLINED_FOR_BRICK))
+# Find outlined logos for brick generation
+SQUARE_OUTLINED_FOR_BRICK = $(wildcard $(SQUARE_OUTLINED_DIR)/spy-square-*.svg)
+HORIZONTAL_SIMPLE_FOR_BRICK = $(wildcard $(HORIZONTAL_OUTLINED_DIR)/spy-simple-*.svg)
+HORIZONTAL_FULL_FOR_BRICK = $(wildcard $(HORIZONTAL_OUTLINED_DIR)/spy-full-*.svg)
 
-# Horizontal simple brick logos (from outlined versions, 30px pixel width)
-HORIZONTAL_SIMPLE_FOR_BRICK = $(wildcard $(HORIZONTAL_OUTLINED_DIR)/spy-logo-horizontal-outlined-*.svg)
-HORIZONTAL_SIMPLE_BRICK = $(patsubst $(HORIZONTAL_OUTLINED_DIR)/%.svg,$(HORIZONTAL_BRICK_DIR)/%-brick.svg,$(HORIZONTAL_SIMPLE_FOR_BRICK))
-
-# Horizontal full brick logos with subtitles (30px pixel width, special handling)
-HORIZONTAL_FULL_FOR_BRICK = $(wildcard $(HORIZONTAL_OUTLINED_DIR)/spy-logo-horizontal-full-*.svg)
-HORIZONTAL_FULL_BRICK = $(patsubst $(HORIZONTAL_OUTLINED_DIR)/%.svg,$(HORIZONTAL_BRICK_DIR)/%-brick.svg,$(HORIZONTAL_FULL_FOR_BRICK))
+# Generate brick filenames
+SQUARE_BRICK_LOGOS = $(patsubst $(SQUARE_OUTLINED_DIR)/%.svg,$(SQUARE_BRICK_DIR)/%-brick.svg,$(notdir $(SQUARE_OUTLINED_FOR_BRICK)))
+HORIZONTAL_SIMPLE_BRICK = $(patsubst $(HORIZONTAL_OUTLINED_DIR)/%.svg,$(HORIZONTAL_BRICK_DIR)/%-brick.svg,$(notdir $(HORIZONTAL_SIMPLE_FOR_BRICK)))
+HORIZONTAL_FULL_BRICK = $(patsubst $(HORIZONTAL_OUTLINED_DIR)/%.svg,$(HORIZONTAL_BRICK_DIR)/%-brick.svg,$(notdir $(HORIZONTAL_FULL_FOR_BRICK)))
 
 # All brick variants
 ALL_BRICK_LOGOS = $(SQUARE_BRICK_LOGOS) $(HORIZONTAL_SIMPLE_BRICK) $(HORIZONTAL_FULL_BRICK)
 
 # Generate all brick logos
 .PHONY: brick
-brick: $(ALL_BRICK_LOGOS)
-	@echo "Generated all brick logo variants"
-
-# Square brick logos (20px pixel width, auto brick sizing)
-$(SQUARE_BRICK_DIR)/%-brick.svg: $(SQUARE_OUTLINED_DIR)/%.svg
-	@mkdir -p $(SQUARE_BRICK_DIR)
-	@echo "Generating brick version: $@"
-	$(NIX_PYTHON) "python brick_blockify.py $< $@ 20 24 20 auto"
-
-# Horizontal simple brick logos (30px pixel width, auto brick sizing)
-$(HORIZONTAL_BRICK_DIR)/spy-logo-horizontal-outlined-%-brick.svg: $(HORIZONTAL_OUTLINED_DIR)/spy-logo-horizontal-outlined-%.svg
-	@mkdir -p $(HORIZONTAL_BRICK_DIR)
-	@echo "Generating brick version: $@"
-	$(NIX_PYTHON) "python brick_blockify.py $< $@ 30 24 20 auto"
-
-# Horizontal full brick logos with subtitles (30px pixel width, special handling)
-$(HORIZONTAL_BRICK_DIR)/spy-logo-horizontal-full-%-brick.svg: $(HORIZONTAL_OUTLINED_DIR)/spy-logo-horizontal-full-%.svg
-	@mkdir -p $(HORIZONTAL_BRICK_DIR)
-	@echo "Generating brick version (full with subtitle): $@"
-	@echo "WARNING: Subtitle handling is simplified"
-	$(NIX_PYTHON) "python brick_blockify_full.py $< $@ 30 24 20"
+brick: outlined
+	@echo "Generating brick logo variants..."
+	@bash generate_all_brick_variants.sh
 
 # Clean brick variants
 .PHONY: clean-brick
 clean-brick:
-	rm -rf $(SQUARE_BRICK_DIR)/*.svg
-	rm -rf $(HORIZONTAL_BRICK_DIR)/*.svg
-	@echo "Cleaned all brick variants"
+	@echo "Cleaning brick variants..."
+	@rm -f $(SQUARE_BRICK_DIR)/*-brick.svg
+	@rm -f $(HORIZONTAL_BRICK_DIR)/*-brick.svg
 
 # Generate only square brick logos
 .PHONY: brick-square
-brick-square: $(SQUARE_BRICK_LOGOS)
-	@echo "Generated square brick logos"
+brick-square: outlined
+	@echo "Generating square brick logos..."
+	@mkdir -p $(SQUARE_BRICK_DIR)
+	@for file in $(SQUARE_OUTLINED_DIR)/spy-square-*.svg; do \
+		basename=$$(basename "$$file" .svg); \
+		output="$(SQUARE_BRICK_DIR)/$${basename}-brick.svg"; \
+		echo "Processing: $$basename"; \
+		nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
+			"python3 brick_blockify.py '$$file' '$$output' 20 24 20 2x2"; \
+	done
 
 # Generate only horizontal brick logos
 .PHONY: brick-horizontal
-brick-horizontal: $(HORIZONTAL_SIMPLE_BRICK) $(HORIZONTAL_FULL_BRICK)
-	@echo "Generated horizontal brick logos"
-
-# Test brick generation with different modes
-.PHONY: test-brick-1x1 test-brick-2x2 test-brick-auto
-test-brick-1x1:
-	@echo "Testing 1×1 brick mode (12px × 20px)"
-	$(NIX_PYTHON) "python brick_blockify.py $(SQUARE_OUTLINED_DIR)/spy-square-multicolor-lightbg.svg test-brick-1x1.svg 20 12 20 1x1"
-
-test-brick-2x2:
-	@echo "Testing 2×2 brick mode (24px × 20px)"
-	$(NIX_PYTHON) "python brick_blockify.py $(SQUARE_OUTLINED_DIR)/spy-square-multicolor-lightbg.svg test-brick-2x2.svg 20 24 20 2x2"
-
-test-brick-auto:
-	@echo "Testing adaptive brick mode (mix of 1×1 and 2×2)"
-	$(NIX_PYTHON) "python brick_blockify.py $(SQUARE_OUTLINED_DIR)/spy-square-multicolor-lightbg.svg test-brick-auto.svg 20 24 20 auto"
+brick-horizontal: outlined
+	@echo "Generating horizontal brick logos..."
+	@mkdir -p $(HORIZONTAL_BRICK_DIR)
+	@for file in $(HORIZONTAL_OUTLINED_DIR)/spy-simple-*.svg; do \
+		basename=$$(basename "$$file" .svg); \
+		output="$(HORIZONTAL_BRICK_DIR)/$${basename}-brick.svg"; \
+		echo "Processing: $$basename"; \
+		nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
+			"python3 brick_blockify.py '$$file' '$$output' 30 24 20 2x2"; \
+	done
+	@for file in $(HORIZONTAL_OUTLINED_DIR)/spy-full-*.svg; do \
+		basename=$$(basename "$$file" .svg); \
+		output="$(HORIZONTAL_BRICK_DIR)/$${basename}-brick.svg"; \
+		echo "Processing: $$basename (with subtitle)"; \
+		nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
+			"python3 brick_blockify_full.py '$$file' '$$output' 30 24 20"; \
+	done

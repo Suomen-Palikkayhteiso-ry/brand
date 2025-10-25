@@ -30,7 +30,7 @@ def create_brick_side_view(x, y, brick_width, brick_height, color, opacity=1.0, 
     Real brick proportions: 0.6" × 0.6" × 0.5" (width × depth × height)
     Height is 5/6 of width. Studs on top are part of the height.
     
-    brick_type: "1x1" or "2x2" - determines number of studs
+    brick_type: "1x1" or "2x2" - determines number of studs (always 2 studs for consistency)
     """
     r, g, b = color
     
@@ -42,14 +42,10 @@ def create_brick_side_view(x, y, brick_width, brick_height, color, opacity=1.0, 
     
     # Brick proportions: studs are about 15% of brick height
     # The TOTAL brick height includes studs - they don't add to the height
-    if show_studs:
-        stud_height = max(2, int(brick_height * 0.15))  # ~15% for studs
-        body_height = brick_height - stud_height  # Body is the rest
-        body_y = y + stud_height
-    else:
-        stud_height = 0
-        body_height = brick_height
-        body_y = y
+    # ALWAYS show studs - they're part of the brick design
+    stud_height = max(2, int(brick_height * 0.15))  # ~15% for studs
+    body_height = brick_height - stud_height  # Body is the rest
+    body_y = y + stud_height
     
     # Main brick body - ONLY base color, NO opacity variations!
     elements.append(f'  <rect x="{x}" y="{body_y}" width="{brick_width}" height="{body_height}" fill="{base_color}"/>')
@@ -64,35 +60,33 @@ def create_brick_side_view(x, y, brick_width, brick_height, color, opacity=1.0, 
     # Right border
     elements.append(f'  <line x1="{x + brick_width}" y1="{body_y}" x2="{x + brick_width}" y2="{y + brick_height}" stroke="{border_color}" stroke-width="0.5" opacity="0.3"/>')
     
-    # Studs on top (only if show_studs=True)
-    if show_studs:
-        num_studs = 1 if brick_type == "1x1" else 2
+    # Studs on top - layout depends on brick type
+    # 1x1 brick: single stud (same width as 2x2 studs = 8px), 2x2 brick: two studs
+    if brick_type == "1x1":
+        # Single centered stud with same width as 2x2 brick studs (8px)
+        stud_width = 8  # Fixed width to match 2x2 brick stud width
+        stud_x = x + (brick_width - stud_width) // 2  # Center it
+        stud_y = y
         
-        if brick_type == "1x1":
-            # Single centered stud for 1x1 brick
-            stud_width = brick_width // 2
-            stud_x = x + (brick_width - stud_width) // 2
+        # Stud body - ONLY base color, NO opacity, SHARP corners (no rx)
+        elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="{base_color}"/>')
+        
+        # Hairline border around stud - SHARP corners (no rx)
+        elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="none" stroke="{border_color}" stroke-width="0.5" opacity="0.2"/>')
+    else:
+        # Two studs for 2x2 brick
+        stud_width = brick_width // 3
+        stud_spacing = brick_width // 2
+        
+        for i in range(2):
+            stud_x = x + (brick_width // 4) + (i * stud_spacing) - stud_width // 2
             stud_y = y
             
-            # Stud body - ONLY base color, NO opacity
-            elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="{base_color}" rx="{stud_width//3}"/>')
+            # Stud body - ONLY base color, NO opacity, SHARP corners (no rx)
+            elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="{base_color}"/>')
             
-            # Hairline border around stud
-            elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="none" stroke="{border_color}" stroke-width="0.5" opacity="0.2" rx="{stud_width//3}"/>')
-        else:
-            # Two studs for 2x2 brick
-            stud_width = brick_width // 3
-            stud_spacing = brick_width // 2
-            
-            for i in range(2):
-                stud_x = x + (brick_width // 4) + (i * stud_spacing) - stud_width // 2
-                stud_y = y
-                
-                # Stud body - ONLY base color, NO opacity
-                elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="{base_color}" rx="{stud_width//3}"/>')
-                
-                # Hairline border around stud
-                elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="none" stroke="{border_color}" stroke-width="0.5" opacity="0.2" rx="{stud_width//3}"/>')
+            # Hairline border around stud - SHARP corners (no rx)
+            elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="none" stroke="{border_color}" stroke-width="0.5" opacity="0.2"/>')
     
     return elements
 
@@ -151,23 +145,42 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
                     x += 1
     else:
         # Fixed brick size
-        brick_width_fixed = block_width // 2 if brick_type == "1x1" else block_width
-        for y in range(height):
-            for x in range(width):
-                if opaque_map.get((x, y), False):
-                    brick_sizes[(x, y)] = brick_width_fixed
+        if brick_type == "1x1":
+            # Simple case: every opaque pixel gets a 1x1 brick
+            for y in range(height):
+                for x in range(width):
+                    if opaque_map.get((x, y), False):
+                        brick_sizes[(x, y)] = block_width // 2
+        else:  # brick_type == "2x2"
+            # For 2x2 mode: try to place 2x2 bricks, fallback to 1x1
+            for y in range(height):
+                x = 0
+                while x < width:
+                    if not opaque_map.get((x, y), False):
+                        x += 1
+                        continue
+                    
+                    # Check if we can place a 2x2 brick (need 2 consecutive opaque pixels)
+                    if x + 1 < width and opaque_map.get((x + 1, y), False):
+                        # Place 2x2 brick
+                        brick_sizes[(x, y)] = block_width
+                        brick_sizes[(x + 1, y)] = 0  # Skip next pixel
+                        x += 2
+                    else:
+                        # Not enough space for 2x2, use 1x1 brick
+                        brick_sizes[(x, y)] = block_width // 2
+                        x += 1
     
     # Calculate actual SVG dimensions
-    svg_width = 0
-    svg_height = height * block_height
+    # Width should be based on the maximum x-coordinate of any brick
+    svg_width = width * (block_width // 2)  # Each pixel position takes half-width
     
-    # Calculate width per row
-    for y in range(height):
-        row_width = 0
-        for x in range(width):
-            if brick_sizes.get((x, y), 0) > 0:
-                row_width += brick_sizes[(x, y)]
-        svg_width = max(svg_width, row_width)
+    # Height: based on pixel grid y-coordinates using body_height for spacing
+    stud_height = max(2, int(block_height * 0.15))
+    body_height = block_height - stud_height
+    
+    # Maximum y-coordinate in pixels, plus one full brick height
+    svg_height = height * body_height + stud_height
     
     svg_parts = [
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
@@ -176,9 +189,13 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
         f'  <desc>Brick-style blocky version - {brick_type} bricks side view</desc>',
     ]
     
-    # Process each pixel as a brick
-    for y in range(height):
-        brick_x = 0
+    # Calculate stud and body heights once
+    stud_height = max(2, int(block_height * 0.15))
+    body_height = block_height - stud_height
+    
+    # Process each pixel as a brick - DRAW FROM BOTTOM TO TOP (reverse y order)
+    # This way upper bricks are drawn after (on top of) lower bricks, hiding studs below
+    for y in range(height - 1, -1, -1):  # Start from bottom (highest y) to top (y=0)
         for x in range(width):
             brick_w = brick_sizes.get((x, y), 0)
             if brick_w == 0:
@@ -186,17 +203,22 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
             
             r, g, b, a = color_map.get((x, y), (0, 0, 0, 0))
             
-            # Calculate brick position
-            brick_y = y * block_height
+            # Calculate brick position based on pixel coordinates to preserve shape
+            brick_x = x * (block_width // 2)  # Each pixel x-position is half-width unit
             
-            # Show studs if there's no brick directly above this one
-            show_studs = (y == 0) or not opaque_map.get((x, y - 1), False)
+            # Y position: each row is spaced by body_height, so bricks stack on studs
+            # This creates proper vertical stacking where upper bricks sit on lower brick studs
+            brick_y = y * body_height
+            
+            # All bricks show studs - they're always visible from the side view
+            show_studs = True
             
             # Determine brick type based on width
             btype = "1x1" if brick_w == block_width // 2 else "2x2"
             
             # Create brick from side view - NO SHADING, only original RGB color
             # Opacity is ignored - we use only opaque bricks
+            # All bricks have studs for consistent appearance
             brick_elements = create_brick_side_view(
                 brick_x, brick_y, brick_w, block_height,
                 (r, g, b),
@@ -205,7 +227,6 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
             )
             
             svg_parts.extend(brick_elements)
-            brick_x += brick_w
     
     svg_parts.append('</svg>')
     

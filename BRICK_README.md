@@ -11,6 +11,8 @@ This directory contains tools to generate blocky "brick-style" versions of SPY l
 
 - **Adaptive Brick Sizing**: Automatically chooses between 1×1 and 2×2 bricks based on pixel patterns for optimal appearance
 
+- **Subtitle Preservation**: "Full" logos (with subtitle "Suomen Palikkayhteisö ry") preserve the subtitle as vector text while blockifying only the main "SPY" title
+
 - **No Shading**: Uses only original logo RGB colors without any opacity variations or color manipulation
 
 - **Hairline Borders**: 0.5px black borders at 30% opacity between bricks
@@ -51,9 +53,9 @@ make clean-brick
 ## Files
 
 - `brick_blockify.py`: Main script for generating brick-style logos
-- `brick_blockify_full.py`: Special handling for "full" logos with subtitles (WIP)
+- `brick_blockify_full.py`: Special handling for "full" logos with subtitles - preserves subtitle as vector text
 - `Makefile`: Build system with targets for all variants
-- `generate_all_brick_variants.sh`: Bash script for batch generation (legacy)
+- `generate_all_brick_variants.sh`: Bash script for batch generation
 
 ## Technical Details
 
@@ -90,6 +92,18 @@ In `auto` mode (default), the algorithm:
 3. **Analyze**: Determine brick placement and colors
 4. **Generate**: Create SVG with brick elements
 
+### Full Logo Processing
+
+For logos with subtitles (e.g., `spy-full-multicolor-lightbg.svg`):
+
+1. **Split**: The script separates the main "SPY" title from the subtitle "Suomen Palikkayhteisö ry"
+2. **Blockify**: Only the title portion is converted to brick-style
+3. **Combine**: The brick title and original vector subtitle are combined in the final output
+4. **Scale**: The subtitle is scaled proportionally to match the brick title width
+5. **Position**: The subtitle is positioned directly below the brick title
+
+This ensures that the subtitle remains crisp and readable as vector text while the title has the distinctive brick aesthetic.
+
 ## Output Structure
 
 ```
@@ -118,11 +132,9 @@ These are provided via nix-shell in the Makefile targets.
 
 ## Known Limitations
 
-1. **Subtitle Handling**: "Full" logos with subtitles currently blockify the entire image. Proper subtitle preservation (keeping subtitle as vector while blockifying only the title) is work in progress.
+1. **Color Precision**: Colors are quantized to the nearest pixel in the low-resolution grid, which may slightly alter gradients or subtle color transitions in the original.
 
-2. **Color Precision**: Colors are quantized to the nearest pixel in the low-resolution grid, which may slightly alter gradients or subtle color transitions in the original.
-
-3. **Detail Loss**: By design, fine details are lost in the blockification process. This is intentional for the "brick" aesthetic.
+2. **Detail Loss**: By design, fine details are lost in the blockification process. This is intentional for the "brick" aesthetic.
 
 ## Examples
 
