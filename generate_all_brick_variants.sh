@@ -30,14 +30,14 @@ for file in logo/square/svg/outlined/spy-square-*.svg; do
     
     echo "Processing: $basename"
     nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
-        "python3 brick_blockify.py '$file' '$output_svg' 20 24 20 2x2"
+        "python3 brick_blockify.py '$file' '$output_svg' 20 24 20 auto"
     
     convert_to_raster "$output_svg" "$output_png" "$output_webp" 800
     echo ""
 done
 
 # Horizontal logos without subtitle (30 pixels wide for wider horizontal format)
-# These use 2x2 bricks for the full logo
+# These use auto detection for adaptive brick sizing (1x, 2x, 3x, 4x)
 echo "=== Processing Horizontal Logos (Full, no subtitle) ==="
 for file in logo/horizontal/svg/outlined/spy-simple-*.svg; do
     basename=$(basename "$file" .svg)
@@ -47,7 +47,7 @@ for file in logo/horizontal/svg/outlined/spy-simple-*.svg; do
     
     echo "Processing: $basename"
     nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
-        "python3 brick_blockify.py '$file' '$output_svg' 30 24 20 2x2"
+        "python3 brick_blockify.py '$file' '$output_svg' 30 24 20 auto"
     
     convert_to_raster "$output_svg" "$output_png" "$output_webp" 1600
     echo ""

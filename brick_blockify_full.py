@@ -169,13 +169,13 @@ def process_full_logo(input_svg, output_svg, pixel_width=30, block_width=24, blo
     print(f"  Found {len(subtitle_elements)} subtitle element(s)")
     print("  Blockifying title...")
     
-    # Blockify the title portion
+    # Blockify the title portion with auto brick sizing
     brick_title_svg = tempfile.NamedTemporaryFile(mode='w', suffix='.svg', delete=False).name
     
     cmd = [
         'python3', 'brick_blockify.py',
         title_svg, brick_title_svg,
-        str(pixel_width), str(block_width), str(block_height), '2x2'
+        str(pixel_width), str(block_width), str(block_height), 'auto'
     ]
     
     subprocess.run(cmd, check=True)
