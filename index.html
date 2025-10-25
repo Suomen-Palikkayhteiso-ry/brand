@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPY Brand Guide - Suomen Palikkayhteisö ry</title>
+    <style>
+        @font-face {
+            font-family: 'Outfit';
+            src: url('fonts/Outfit-VariableFont_wght.ttf') format('truetype');
+            font-weight: 100 900;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #52d3d8 0%, #3887be 50%, #38419d 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+        
+        nav {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 1rem;
+        }
+        
+        nav a {
+            color: #38419d;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        nav a:hover {
+            color: #52d3d8;
+            transform: translateY(-2px);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        section {
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #38419d;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        h3 {
+            color: #3887be;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            font-weight: 600;
+        }
+        
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .color-swatch {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .color-box {
+            height: 100px;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #ddd;
+        }
+        
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .color-hex {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .logo-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .logo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .logo-preview {
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+        }
+        
+        .logo-preview.dark {
+            background: #200e3a;
+        }
+        
+        .logo-preview.light {
+            background: #f8f8f8;
+        }
+        
+        .logo-preview.gradient {
+            background: linear-gradient(135deg, #52d3d8 0%, #3887be 50%, #38419d 100%);
+        }
+        
+        .logo-preview img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .logo-info {
+            padding: 1rem;
+            background: #f8f8f8;
+            border-top: 1px solid #ddd;
+        }
+        
+        .logo-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: #52d3d8;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+            margin-top: 0.5rem;
+        }
+        
+        .download-btn:hover {
+            background: #3887be;
+        }
+        
+        .font-sample {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+        
+        .font-weights {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .font-weight-sample {
+            padding: 1rem;
+            border-left: 4px solid #52d3d8;
+            background: white;
+        }
+        
+        footer {
+            background: #200e3a;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #52d3d8;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
+        .badge.recommended {
+            background: #38419d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SPY</h1>
+        <p>Suomen Palikkayhteisö ry - Brändiopas</p>
+    </header>
+    
+        <nav>
+        <ul>
+            <li><a href="#colors">Värit</a></li>
+            <li><a href="#typography">Typografia</a></li>
+            <li><a href="#logos-simple">Yksinkertaiset logot</a></li>
+            <li><a href="#logos-full">Täydet logot</a></li>
+            <li><a href="#logos-square">Neliölogot</a></li>
+            <li><a href="#download">Lataa</a></li>
+        </ul>
+    </nav>    <div class="container">
+        <!-- Colors Section -->
+        <section id="colors">
+            <h2>Brand Colors</h2>
+            <p>Our color palette combines modern, fresh tones that reflect innovation and community.</p>
+            
+            <div class="color-palette">
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #52d3d8;"></div>
+                    <div class="color-name">Aqua</div>
+                    <div class="color-hex">#52d3d8</div>
+                    <span class="badge">Primary</span>
+                </div>
+                
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #3887be;"></div>
+                    <div class="color-name">Light Blue</div>
+                    <div class="color-hex">#3887be</div>
+                    <span class="badge">Secondary</span>
+                </div>
+                
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #38419d;"></div>
+                    <div class="color-name">Dark Purple</div>
+                    <div class="color-hex">#38419d</div>
+                    <span class="badge">Accent</span>
+                </div>
+                
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #200e3a;"></div>
+                    <div class="color-name">Very Dark Blue</div>
+                    <div class="color-hex">#200e3a</div>
+                </div>
+                
+                <div class="color-swatch">
+                    <div class="color-box" style="background: #f2f597;"></div>
+                    <div class="color-name">Bright Yellow</div>
+                    <div class="color-hex">#f2f597</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Typography Section -->
+        <section id="typography">
+            <h2>Typography</h2>
+            <p>We use <strong>Outfit</strong> from Google Fonts for all brand communications.</p>
+            
+            <div class="font-sample">
+                <div class="font-weights">
+                    <div class="font-weight-sample" style="font-weight: 100;">
+                        <strong>Thin (100):</strong> The quick brown fox jumps over the lazy dog
+                    </div>
+                    <div class="font-weight-sample" style="font-weight: 300;">
+                        <strong>Light (300):</strong> The quick brown fox jumps over the lazy dog
+                    </div>
+                    <div class="font-weight-sample" style="font-weight: 400;">
+                        <strong>Regular (400):</strong> The quick brown fox jumps over the lazy dog
+                    </div>
+                    <div class="font-weight-sample" style="font-weight: 500;">
+                        <strong>Medium (500):</strong> The quick brown fox jumps over the lazy dog
+                    </div>
+                    <div class="font-weight-sample" style="font-weight: 700;">
+                        <strong>Bold (700):</strong> The quick brown fox jumps over the lazy dog
+                    </div>
+                    <div class="font-weight-sample" style="font-weight: 800;">
+                        <strong>Extra Bold (800):</strong> The quick brown fox jumps over the lazy dog
+                    </div>
+                    <div class="font-weight-sample" style="font-weight: 900;">
+                        <strong>Black (900):</strong> The quick brown fox jumps over the lazy dog
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Simple Logos -->
+        <section id="logos-simple">
+            <h2>Simple "SPY" Logos</h2>
+            <p>Clean, minimal versions for small sizes and simple applications.</p>
+            
+            <div class="logo-grid">
+                <div class="logo-card">
+                    <div class="logo-preview light">
+                        <img src="logo/horizontal/svg/outlined/spy-simple-black.svg" alt="SPY Black">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY - Black</div>
+                        <a href="logo/horizontal/svg/outlined/spy-simple-black.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview dark">
+                        <img src="logo/horizontal/svg/outlined/spy-simple-white.svg" alt="SPY White">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY - White</div>
+                        <a href="logo/horizontal/svg/outlined/spy-simple-white.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview light">
+                        <img src="logo/horizontal/svg/outlined/spy-simple-multicolor-lightbg.svg" alt="SPY Multi-Color Light">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY - Multi-Color (Light BG) <span class="badge recommended">Featured</span></div>
+                        <a href="logo/horizontal/svg/outlined/spy-simple-multicolor-lightbg.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview dark">
+                        <img src="logo/horizontal/svg/outlined/spy-simple-multicolor-darkbg.svg" alt="SPY Multi-Color Dark">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY - Multi-Color (Dark BG) <span class="badge recommended">Featured</span></div>
+                        <a href="logo/horizontal/svg/outlined/spy-simple-multicolor-darkbg.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Full Logos -->
+        <section id="logos-full">
+            <h2>Full Logos with Subtitle</h2>
+            <p>Complete logos featuring "SPY" with "Suomen Palikkayhteisö ry" subtitle.</p>
+            
+            <div class="logo-grid">
+                <div class="logo-card">
+                    <div class="logo-preview dark">
+                        <img src="logo/horizontal/svg/outlined/spy-full-white.svg" alt="SPY Full White">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">All White</div>
+                        <a href="logo/horizontal/svg/outlined/spy-full-white.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview dark">
+                        <img src="logo/horizontal/svg/outlined/spy-full-multicolor-darkbg.svg" alt="SPY Full Multi-Color Dark">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">Multi-Color (Dark BG) <span class="badge recommended">Featured</span></div>
+                        <a href="logo/horizontal/svg/outlined/spy-full-multicolor-darkbg.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview light">
+                        <img src="logo/horizontal/svg/outlined/spy-full-black.svg" alt="SPY Full Black">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">All Black</div>
+                        <a href="logo/horizontal/svg/outlined/spy-full-black.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview light">
+                        <img src="logo/horizontal/svg/outlined/spy-full-multicolor-lightbg.svg" alt="SPY Full Multi-Color Light">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">Multi-Color (Light BG) <span class="badge recommended">Featured</span></div>
+                        <a href="logo/horizontal/svg/outlined/spy-full-multicolor-lightbg.svg" download class="download-btn">Download SVG</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Square Logos -->
+        <section id="logos-square">
+            <h2>Square Logos</h2>
+            <p>Square format logos centered vertically, perfect for social media profiles, app icons, and square placements.</p>
+            
+            <div class="logo-grid">
+                <div class="logo-card">
+                    <div class="logo-preview light">
+                        <img src="logo/square/svg/outlined/spy-square-black.svg" alt="SPY Square Black" style="max-width: 200px;">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY Square - Black</div>
+                        <a href="logo/square/svg/outlined/spy-square-black.svg" download class="download-btn">Download SVG</a>
+                        <a href="logo/square/png/spy-square-black.png" download class="download-btn">Download PNG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview dark">
+                        <img src="logo/square/svg/outlined/spy-square-white.svg" alt="SPY Square White" style="max-width: 200px;">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY Square - White</div>
+                        <a href="logo/square/svg/outlined/spy-square-white.svg" download class="download-btn">Download SVG</a>
+                        <a href="logo/square/png/spy-square-white.png" download class="download-btn">Download PNG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview light">
+                        <img src="logo/square/svg/outlined/spy-square-multicolor-lightbg.svg" alt="SPY Square Multi-Color Light" style="max-width: 200px;">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY Square - Multi-Color (Light BG) <span class="badge recommended">Featured</span></div>
+                        <a href="logo/square/svg/outlined/spy-square-multicolor-lightbg.svg" download class="download-btn">Download SVG</a>
+                        <a href="logo/square/png/spy-square-multicolor-lightbg.png" download class="download-btn">Download PNG</a>
+                    </div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview dark">
+                        <img src="logo/square/svg/outlined/spy-square-multicolor-darkbg.svg" alt="SPY Square Multi-Color Dark" style="max-width: 200px;">
+                    </div>
+                    <div class="logo-info">
+                        <div class="logo-name">SPY Square - Multi-Color (Dark BG) <span class="badge recommended">Featured</span></div>
+                        <a href="logo/square/svg/outlined/spy-square-multicolor-darkbg.svg" download class="download-btn">Download SVG</a>
+                        <a href="logo/square/png/spy-square-multicolor-darkbg.png" download class="download-btn">Download PNG</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Download Section -->
+        <section id="download">
+            <h2>Download All Assets</h2>
+            <p>All logo files are available in SVG format with text converted to paths for universal compatibility.</p>
+            
+            <h3>What's Included</h3>
+            <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                <li><strong>12 Logo Variations</strong> - 8 horizontal + 4 square, all in outlined SVG format</li>
+                <li><strong>PNG Exports</strong> - 1600px (horizontal) and 800px (square) transparent backgrounds</li>
+                <li><strong>Outfit Font Family</strong> - Variable font + 9 static weights</li>
+                <li><strong>Color Palette</strong> - 5 brand colors with hex codes</li>
+                <li><strong>Documentation</strong> - Complete usage guidelines</li>
+            </ul>
+            
+            <div style="margin-top: 2rem;">
+                <a href="https://github.com/datakurre/spy-brand" class="download-btn" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+                    View on GitHub
+                </a>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Suomen Palikkayhteisö ry | SPY Brand Guide</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+            Fonts: Outfit by Google Fonts (SIL Open Font License)
+        </p>
+    </footer>
+</body>
+</html>

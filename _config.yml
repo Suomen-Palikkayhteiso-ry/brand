@@ -1,0 +1,37 @@
+# GitHub Pages configuration for SPY Brand Guide
+
+title: SPY Brand Guide
+description: Suomen Palikkayhteisö ry - Brand Identity Guidelines
+author: Suomen Palikkayhteisö ry
+
+# Theme (using none since we have custom HTML)
+theme: null
+
+# Include these files in the site
+include:
+  - fonts
+  - logo
+  - colors.txt
+
+# Exclude from processing
+exclude:
+  - README.md
+  - LOGO-SUMMARY.md
+  - logo/README.md
+  - fonts/README.md
+  - logo/horizontal/svg/README.md
+
+# Enable relative links
+relative_links:
+  enabled: true
+  collections: false
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+# Plugins
+plugins:
+  - jekyll-relative-links
