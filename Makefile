@@ -124,25 +124,37 @@ help:
 	@echo "SPY Logo Makefile"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  all      - Generate all outlined SVG, PNG and WebP files (default)"
-	@echo "  outlined - Generate outlined SVG files only"
-	@echo "  png      - Generate PNG files (requires outlined SVGs)"
-	@echo "  webp     - Generate WebP files (requires PNG files)"
-	@echo "  clean    - Remove all generated files"
-	@echo "  rebuild  - Clean and rebuild everything"
-	@echo "  help     - Show this help message"
+	@echo "  all              - Generate all outlined SVG, PNG and WebP files (default)"
+	@echo "  outlined         - Generate outlined SVG files only"
+	@echo "  png              - Generate PNG files (requires outlined SVGs)"
+	@echo "  webp             - Generate WebP files (requires PNG files)"
+	@echo "  brick            - Generate all brick-style variants (SVG, PNG, WebP)"
+	@echo "  brick-square     - Generate square brick logos (SVG only)"
+	@echo "  brick-horizontal - Generate horizontal brick logos (SVG only)"
+	@echo "  clean            - Remove all generated files"
+	@echo "  clean-brick      - Remove all brick-style generated files"
+	@echo "  rebuild          - Clean and rebuild everything"
+	@echo "  status           - Show file counts for generated assets"
+	@echo "  help             - Show this help message"
+	@echo ""
+	@echo "Test targets:"
+	@echo "  test-brick-1x1   - Test 1x1 brick mode on first square logo"
+	@echo "  test-brick-2x2   - Test 2x2 brick mode on first square logo"
+	@echo "  test-brick-auto  - Test auto brick mode on first square logo"
 	@echo ""
 	@echo "Horizontal logos:"
 	@echo "  Source SVGs: $(HORIZONTAL_SVG_DIR)/spy-*.svg"
 	@echo "  Outlined SVGs: $(HORIZONTAL_OUTLINED_DIR)/"
 	@echo "  PNG files (1600px): $(HORIZONTAL_PNG_DIR)/"
 	@echo "  WebP files (1600px): $(HORIZONTAL_PNG_DIR)/"
+	@echo "  Brick variants: $(HORIZONTAL_BRICK_DIR)/"
 	@echo ""
 	@echo "Square logos:"
 	@echo "  Source SVGs: $(SQUARE_SVG_DIR)/spy-*.svg"
 	@echo "  Outlined SVGs: $(SQUARE_OUTLINED_DIR)/"
 	@echo "  PNG files (800px): $(SQUARE_PNG_DIR)/"
 	@echo "  WebP files (800px): $(SQUARE_PNG_DIR)/"
+	@echo "  Brick variants: $(SQUARE_BRICK_DIR)/"
 
 # Show status of generated files
 .PHONY: status
@@ -172,20 +184,7 @@ status:
 HORIZONTAL_BRICK_DIR = $(HORIZONTAL_OUTLINED_DIR)/brick
 SQUARE_BRICK_DIR = $(SQUARE_OUTLINED_DIR)/brick
 
-# Find outlined logos for brick generation
-SQUARE_OUTLINED_FOR_BRICK = $(wildcard $(SQUARE_OUTLINED_DIR)/spy-square-*.svg)
-HORIZONTAL_SIMPLE_FOR_BRICK = $(wildcard $(HORIZONTAL_OUTLINED_DIR)/spy-simple-*.svg)
-HORIZONTAL_FULL_FOR_BRICK = $(wildcard $(HORIZONTAL_OUTLINED_DIR)/spy-full-*.svg)
-
-# Generate brick filenames
-SQUARE_BRICK_LOGOS = $(patsubst $(SQUARE_OUTLINED_DIR)/%.svg,$(SQUARE_BRICK_DIR)/%-brick.svg,$(notdir $(SQUARE_OUTLINED_FOR_BRICK)))
-HORIZONTAL_SIMPLE_BRICK = $(patsubst $(HORIZONTAL_OUTLINED_DIR)/%.svg,$(HORIZONTAL_BRICK_DIR)/%-brick.svg,$(notdir $(HORIZONTAL_SIMPLE_FOR_BRICK)))
-HORIZONTAL_FULL_BRICK = $(patsubst $(HORIZONTAL_OUTLINED_DIR)/%.svg,$(HORIZONTAL_BRICK_DIR)/%-brick.svg,$(notdir $(HORIZONTAL_FULL_FOR_BRICK)))
-
-# All brick variants
-ALL_BRICK_LOGOS = $(SQUARE_BRICK_LOGOS) $(HORIZONTAL_SIMPLE_BRICK) $(HORIZONTAL_FULL_BRICK)
-
-# Generate all brick logos
+# Generate all brick logos (calls shell script for PNG/WebP generation too)
 .PHONY: brick
 brick: outlined
 	@echo "Generating brick logo variants..."
@@ -197,8 +196,12 @@ clean-brick:
 	@echo "Cleaning brick variants..."
 	@rm -f $(SQUARE_BRICK_DIR)/*-brick.svg
 	@rm -f $(HORIZONTAL_BRICK_DIR)/*-brick.svg
+	@rm -f $(SQUARE_PNG_DIR)/*-brick.png
+	@rm -f $(SQUARE_PNG_DIR)/*-brick.webp
+	@rm -f $(HORIZONTAL_PNG_DIR)/*-brick.png
+	@rm -f $(HORIZONTAL_PNG_DIR)/*-brick.webp
 
-# Generate only square brick logos
+# Generate only square brick logos (SVG only, no PNG/WebP)
 .PHONY: brick-square
 brick-square: outlined
 	@echo "Generating square brick logos..."
@@ -208,10 +211,10 @@ brick-square: outlined
 		output="$(SQUARE_BRICK_DIR)/$${basename}-brick.svg"; \
 		echo "Processing: $$basename"; \
 		nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
-			"python3 brick_blockify.py '$$file' '$$output' 20 24 20 2x2"; \
+			"python3 brick_blockify.py '$$file' '$$output' 20 24 20 auto"; \
 	done
 
-# Generate only horizontal brick logos
+# Generate only horizontal brick logos (SVG only, no PNG/WebP)
 .PHONY: brick-horizontal
 brick-horizontal: outlined
 	@echo "Generating horizontal brick logos..."
@@ -221,7 +224,7 @@ brick-horizontal: outlined
 		output="$(HORIZONTAL_BRICK_DIR)/$${basename}-brick.svg"; \
 		echo "Processing: $$basename"; \
 		nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
-			"python3 brick_blockify.py '$$file' '$$output' 30 24 20 2x2"; \
+			"python3 brick_blockify.py '$$file' '$$output' 30 24 20 auto"; \
 	done
 	@for file in $(HORIZONTAL_OUTLINED_DIR)/spy-full-*.svg; do \
 		basename=$$(basename "$$file" .svg); \
@@ -230,3 +233,37 @@ brick-horizontal: outlined
 		nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
 			"python3 brick_blockify_full.py '$$file' '$$output' 30 24 20"; \
 	done
+
+# Test brick generation with different modes (square logos only)
+.PHONY: test-brick-1x1
+test-brick-1x1: outlined
+	@echo "Testing 1x1 brick mode on first square logo..."
+	@mkdir -p $(SQUARE_BRICK_DIR)
+	@file=$$(ls $(SQUARE_OUTLINED_DIR)/spy-square-*.svg | head -n 1); \
+	basename=$$(basename "$$file" .svg); \
+	output="$(SQUARE_BRICK_DIR)/$${basename}-brick-test-1x1.svg"; \
+	echo "Processing: $$basename (1x1 mode)"; \
+	nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
+		"python3 brick_blockify.py '$$file' '$$output' 20 24 20 1x1"
+
+.PHONY: test-brick-2x2
+test-brick-2x2: outlined
+	@echo "Testing 2x2 brick mode on first square logo..."
+	@mkdir -p $(SQUARE_BRICK_DIR)
+	@file=$$(ls $(SQUARE_OUTLINED_DIR)/spy-square-*.svg | head -n 1); \
+	basename=$$(basename "$$file" .svg); \
+	output="$(SQUARE_BRICK_DIR)/$${basename}-brick-test-2x2.svg"; \
+	echo "Processing: $$basename (2x2 mode)"; \
+	nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
+		"python3 brick_blockify.py '$$file' '$$output' 20 24 20 2x2"
+
+.PHONY: test-brick-auto
+test-brick-auto: outlined
+	@echo "Testing auto brick mode on first square logo..."
+	@mkdir -p $(SQUARE_BRICK_DIR)
+	@file=$$(ls $(SQUARE_OUTLINED_DIR)/spy-square-*.svg | head -n 1); \
+	basename=$$(basename "$$file" .svg); \
+	output="$(SQUARE_BRICK_DIR)/$${basename}-brick-test-auto.svg"; \
+	echo "Processing: $$basename (auto mode)"; \
+	nix-shell -p "python3.withPackages(ps: [ ps.pillow ps.cairosvg ])" --run \
+		"python3 brick_blockify.py '$$file' '$$output' 20 24 20 auto"

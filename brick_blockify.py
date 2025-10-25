@@ -65,9 +65,9 @@ def create_brick_side_view(x, y, brick_width, brick_height, color, opacity=1.0, 
     # Studs are aligned on a 12px grid (1x brick width) for consistency
     stud_count = {"1x1": 1, "2x2": 2, "3x3": 3, "4x4": 4}.get(brick_type, 2)
     
-    # 7px wide (adding 0.5px per side compared to 6px) and taller (3px) studs
+    # 7px wide studs centered in 12px grid cells
+    # Use the allocated stud_height (already calculated as 15% of brick_height)
     stud_width = 7
-    stud_height_override = max(3, int(brick_height * 0.18))  # Slightly taller than before
     
     # Position studs on 12px grid (aligned with 1x brick centers)
     # Each stud is centered in its 12px cell
@@ -79,10 +79,11 @@ def create_brick_side_view(x, y, brick_width, brick_height, color, opacity=1.0, 
         stud_y = y
         
         # Stud body - ONLY base color, NO opacity, SHARP corners (no rx)
-        elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height_override}" fill="{base_color}"/>')
+        # Use stud_height (not override) to stay within allocated space
+        elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="{base_color}"/>')
         
         # Hairline border around stud - SHARP corners (no rx)
-        elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height_override}" fill="none" stroke="{border_color}" stroke-width="0.5" opacity="0.2"/>')
+        elements.append(f'  <rect x="{stud_x}" y="{stud_y}" width="{stud_width}" height="{stud_height}" fill="none" stroke="{border_color}" stroke-width="0.5" opacity="0.2"/>')
     
     
     return elements
@@ -118,14 +119,13 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
     # Determine brick sizes adaptively if auto mode
     brick_sizes = {}  # (x, y) -> brick_width (12, 24, 36, or 48)
     if brick_type == "auto":
-        import random
         prev_row_first_brick = None  # Track first brick size of previous row
-        prev_row_bricks = {}  # Track all bricks in previous row: x_pos -> length
+        prev_row_bricks = {}  # Track all bricks in previous row: x_pos -> (length, color)
         
         for y in range(height):
             x = 0
             row_first_brick = None  # Track first brick of this row
-            current_row_bricks = {}  # Track bricks in current row
+            current_row_bricks = {}  # Track bricks in current row: x_pos -> (length, color)
             
             while x < width:
                 if not opaque_map.get((x, y), False):
@@ -133,6 +133,15 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
                     continue
                 
                 base_color = color_map.get((x, y), (0, 0, 0, 0))[:3]
+                
+                # Count how many consecutive pixels of same color exist
+                color_run_length = 0
+                for i in range(width - x):
+                    if (opaque_map.get((x + i, y), False) and 
+                        color_map.get((x + i, y), (0, 0, 0, 0))[:3] == base_color):
+                        color_run_length += 1
+                    else:
+                        break
                 
                 # Find all possible brick sizes at this position
                 possible_lengths = []
@@ -151,36 +160,44 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
                     x += 1
                     continue
                 
-                # Check if placing a brick here would stack directly on a similar brick below
-                # Avoid stacking bricks of width > 2 directly on top of same-width bricks
-                max_length = possible_lengths[0]  # Default to longest
+                # Start with longest possible brick
+                max_length = possible_lengths[0]
                 
                 # Check if there's a brick directly below at the same x position
-                if y > 0 and max_length > 2:
-                    brick_below_length = prev_row_bricks.get(x, None)
-                    if brick_below_length == max_length and len(possible_lengths) > 1:
-                        # Try to use a different size to create offset pattern
-                        alternative_lengths = [l for l in possible_lengths if l != max_length]
-                        if alternative_lengths:
-                            max_length = alternative_lengths[0]
+                # Avoid stacking same-width same-color bricks when color run > 2
+                if y > 0:
+                    brick_below = prev_row_bricks.get(x)
+                    if brick_below is not None:
+                        brick_below_length, brick_below_color = brick_below
+                        
+                        # If colors match and color run > 2, avoid using same width
+                        if (brick_below_color == base_color and 
+                            color_run_length > 2 and 
+                            max_length == brick_below_length and
+                            len(possible_lengths) > 1):
+                            # Use a different size to create offset pattern
+                            alternative_lengths = [l for l in possible_lengths if l != max_length]
+                            if alternative_lengths:
+                                # Choose the longest alternative
+                                max_length = alternative_lengths[0]
                 
                 # If this is the first brick of the row, try to vary from previous row
                 if row_first_brick is None and prev_row_first_brick is not None:
                     # Prefer different size than previous row's first brick
                     preferred_lengths = [l for l in possible_lengths if l != prev_row_first_brick]
                     if preferred_lengths:
-                        # Randomly choose from preferred lengths, favoring longer bricks
-                        max_length = random.choice(preferred_lengths)
+                        # Choose the longest preferred size (deterministic)
+                        max_length = preferred_lengths[0]
                     else:
-                        # If we can't vary, choose randomly from all possible
-                        max_length = random.choice(possible_lengths)
+                        # Use longest available
+                        max_length = possible_lengths[0]
                 
                 # Track first brick of this row
                 if row_first_brick is None:
                     row_first_brick = max_length
                 
                 # Track this brick for next row's comparison
-                current_row_bricks[x] = max_length
+                current_row_bricks[x] = (max_length, base_color)
                 
                 # Place brick of detected size
                 brick_w = max_length * (block_width // 2)
@@ -239,7 +256,16 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
     inner_body_height = body_height - inner_stud_height
     
     # Spacing: upper brick body sits on lower brick stud
-    svg_height = (height - 1) * inner_body_height + body_height
+    content_height = (height - 1) * inner_body_height + body_height
+    
+    # For square aspect ratio images (where width == height), make output square
+    # by padding vertically and centering the content
+    if width == height:
+        svg_height = svg_width  # Make it square
+        vertical_offset = (svg_height - content_height) // 2
+    else:
+        svg_height = content_height
+        vertical_offset = 0
     
     svg_parts = [
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
@@ -267,7 +293,8 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
             
             # Y position: space bricks by inner_body_height so upper brick bodies
             # sit on top of lower brick studs, hiding them naturally
-            brick_y = y * inner_body_height
+            # Add vertical_offset to center content in square outputs
+            brick_y = y * inner_body_height + vertical_offset
             
             # All bricks show studs - they're always visible from the side view
             show_studs = True
@@ -337,8 +364,15 @@ def blockify_svg(input_svg, output_svg, pixel_width=20, block_width=24, block_he
     inner_stud_height = max(2, int(body_height * 0.15))
     inner_body_height = body_height - inner_stud_height
     output_width = img.width * (block_width // 2)
-    output_height = (img.height - 1) * inner_body_height + body_height
-    print(f"  Output size: {output_width}×{output_height}")
+    content_height = (img.height - 1) * inner_body_height + body_height
+    
+    # Report actual dimensions (square if input was square)
+    if img.width == img.height:
+        output_height = output_width
+        print(f"  Output size: {output_width}×{output_height} (square, content centered)")
+    else:
+        output_height = content_height
+        print(f"  Output size: {output_width}×{output_height}")
 
 
 if __name__ == '__main__':
