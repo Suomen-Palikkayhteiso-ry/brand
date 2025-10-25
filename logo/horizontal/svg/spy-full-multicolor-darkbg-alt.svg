@@ -10,7 +10,7 @@
     </style>
   </defs>
   <text x="10" y="95" font-family="Outfit" font-size="155" font-weight="700" letter-spacing="-0.01em">
-    <tspan fill="#000000">S</tspan><tspan fill="#000000">P</tspan><tspan fill="#000000" dx="-9">Y</tspan>
+    <tspan fill="#52d3d8">S</tspan><tspan fill="#38419d">P</tspan><tspan fill="#f2f597" dx="-9">Y</tspan>
   </text>
-  <text x="10" y="130" font-family="Outfit" font-size="25" font-weight="400" fill="#000000">Suomen Palikkayhteisö ry</text>
+  <text x="10" y="130" font-family="Outfit" font-size="25" font-weight="400" fill="#f2f597">Suomen Palikkayhteisö ry</text>
 </svg>
