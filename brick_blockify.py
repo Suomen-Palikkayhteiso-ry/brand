@@ -175,12 +175,18 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
     # Width should be based on the maximum x-coordinate of any brick
     svg_width = width * (block_width // 2)  # Each pixel position takes half-width
     
-    # Height: based on pixel grid y-coordinates using body_height for spacing
+    # Height: Calculate the inner dimensions after stud calculation
+    # When we pass body_height to create_brick_side_view, it recalculates:
+    # inner_stud = body_height * 0.15, inner_body = body_height - inner_stud
     stud_height = max(2, int(block_height * 0.15))
     body_height = block_height - stud_height
     
-    # Maximum y-coordinate in pixels, plus one full brick height
-    svg_height = height * body_height + stud_height
+    # The actual rendered body size (what create_brick_side_view will use)
+    inner_stud_height = max(2, int(body_height * 0.15))
+    inner_body_height = body_height - inner_stud_height
+    
+    # Spacing: upper brick body sits on lower brick stud
+    svg_height = (height - 1) * inner_body_height + body_height
     
     svg_parts = [
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
@@ -206,9 +212,9 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
             # Calculate brick position based on pixel coordinates to preserve shape
             brick_x = x * (block_width // 2)  # Each pixel x-position is half-width unit
             
-            # Y position: each row is spaced by body_height, so bricks stack on studs
-            # This creates proper vertical stacking where upper bricks sit on lower brick studs
-            brick_y = y * body_height
+            # Y position: space bricks by inner_body_height so upper brick bodies
+            # sit on top of lower brick studs, hiding them naturally
+            brick_y = y * inner_body_height
             
             # All bricks show studs - they're always visible from the side view
             show_studs = True
@@ -219,8 +225,9 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
             # Create brick from side view - NO SHADING, only original RGB color
             # Opacity is ignored - we use only opaque bricks
             # All bricks have studs for consistent appearance
+            # Use body_height as brick total height (stud will be part of it)
             brick_elements = create_brick_side_view(
-                brick_x, brick_y, brick_w, block_height,
+                brick_x, brick_y, brick_w, body_height,
                 (r, g, b),
                 show_studs=show_studs,
                 brick_type=btype
@@ -261,7 +268,14 @@ def blockify_svg(input_svg, output_svg, pixel_width=20, block_width=24, block_he
         f.write(brick_svg)
     
     print(f"  Saved to {output_svg}")
-    print(f"  Output size: {img.width * block_width}×{img.height * block_height}")
+    # Calculate actual output dimensions with stacking overlap
+    stud_height = max(2, int(block_height * 0.15))
+    body_height = block_height - stud_height
+    inner_stud_height = max(2, int(body_height * 0.15))
+    inner_body_height = body_height - inner_stud_height
+    output_width = img.width * (block_width // 2)
+    output_height = (img.height - 1) * inner_body_height + body_height
+    print(f"  Output size: {output_width}×{output_height}")
 
 
 if __name__ == '__main__':
