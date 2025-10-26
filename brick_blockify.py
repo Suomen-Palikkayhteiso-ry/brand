@@ -214,7 +214,7 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
                 
                 x += max_length
             
-            # Post-process the row to replace 2+1 and 1+2 patterns with 3-width bricks
+            # Post-process the row to replace patterns with better brick combinations
             row_positions = sorted([pos for pos in current_row_bricks.keys()])
             i = 0
             while i < len(row_positions) - 1:
@@ -223,9 +223,49 @@ def image_to_brick_svg(img, block_width=24, block_height=20, min_alpha=128, bric
                 length1, color1 = current_row_bricks[x1]
                 length2, color2 = current_row_bricks[x2]
                 
-                # Check if we have adjacent bricks of similar color forming 2+1 or 1+2
+                # Check if we have adjacent bricks of similar color
                 if colors_similar(color1, color2) and x1 + length1 == x2:
-                    if (length1 == 2 and length2 == 1) or (length1 == 1 and length2 == 2):
+                    # Replace 3+3 with 2+4 (more stable stacking pattern)
+                    if length1 == 3 and length2 == 3:
+                        # Replace with 2-width brick + 4-width brick
+                        brick_sizes[(x1, y)] = 2 * (block_width // 2)
+                        brick_sizes[(x1 + 1, y)] = 0
+                        brick_sizes[(x1 + 2, y)] = 4 * (block_width // 2)
+                        brick_sizes[(x1 + 3, y)] = 0
+                        brick_sizes[(x1 + 4, y)] = 0
+                        brick_sizes[(x1 + 5, y)] = 0
+                        
+                        # Update current_row_bricks tracking
+                        current_row_bricks[x1] = (2, color1)
+                        current_row_bricks[x1 + 2] = (4, color1)
+                        del current_row_bricks[x2]
+                        
+                        # Update row_positions list
+                        row_positions[i + 1] = x1 + 2
+                        i += 1
+                        continue
+                    
+                    # Replace 3+2 with 4+1 (better stacking pattern)
+                    elif length1 == 3 and length2 == 2:
+                        # Replace with 4-width brick + 1-width brick
+                        brick_sizes[(x1, y)] = 4 * (block_width // 2)
+                        brick_sizes[(x1 + 1, y)] = 0
+                        brick_sizes[(x1 + 2, y)] = 0
+                        brick_sizes[(x1 + 3, y)] = 0
+                        brick_sizes[(x1 + 4, y)] = 1 * (block_width // 2)
+                        
+                        # Update current_row_bricks tracking
+                        current_row_bricks[x1] = (4, color1)
+                        current_row_bricks[x1 + 4] = (1, color1)
+                        del current_row_bricks[x2]
+                        
+                        # Update row_positions list
+                        row_positions[i + 1] = x1 + 4
+                        i += 1
+                        continue
+                    
+                    # Replace 2+1 or 1+2 with 3-width brick
+                    elif (length1 == 2 and length2 == 1) or (length1 == 1 and length2 == 2):
                         # Replace with a single 3-width brick using the first brick's color
                         brick_sizes[(x1, y)] = 3 * (block_width // 2)
                         brick_sizes[(x1 + 1, y)] = 0

@@ -142,22 +142,22 @@
   <rect x="26.5" y="119" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2"/>
   <rect x="38.5" y="119" width="7" height="2" fill="rgb(82,211,216)"/>
   <rect x="38.5" y="119" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2"/>
-  <rect x="72" y="121" width="36" height="15" fill="rgb(56,65,157)"/>
-  <line x1="72" y1="121" x2="108" y2="121" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
-  <line x1="72" y1="136" x2="108" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
+  <rect x="72" y="121" width="24" height="15" fill="rgb(56,65,157)"/>
+  <line x1="72" y1="121" x2="96" y2="121" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
+  <line x1="72" y1="136" x2="96" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
   <line x1="72" y1="121" x2="72" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
-  <line x1="108" y1="121" x2="108" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
+  <line x1="96" y1="121" x2="96" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
   <rect x="74.5" y="119" width="7" height="2" fill="rgb(56,65,157)"/>
   <rect x="74.5" y="119" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2"/>
   <rect x="86.5" y="119" width="7" height="2" fill="rgb(56,65,157)"/>
   <rect x="86.5" y="119" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2"/>
+  <rect x="96" y="121" width="48" height="15" fill="rgb(56,65,157)"/>
+  <line x1="96" y1="121" x2="144" y2="121" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
+  <line x1="96" y1="136" x2="144" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
+  <line x1="96" y1="121" x2="96" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
+  <line x1="144" y1="121" x2="144" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
   <rect x="98.5" y="119" width="7" height="2" fill="rgb(56,65,157)"/>
   <rect x="98.5" y="119" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2"/>
-  <rect x="108" y="121" width="36" height="15" fill="rgb(56,65,157)"/>
-  <line x1="108" y1="121" x2="144" y2="121" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
-  <line x1="108" y1="136" x2="144" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
-  <line x1="108" y1="121" x2="108" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
-  <line x1="144" y1="121" x2="144" y2="136" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3"/>
   <rect x="110.5" y="119" width="7" height="2" fill="rgb(56,65,157)"/>
   <rect x="110.5" y="119" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2"/>
   <rect x="122.5" y="119" width="7" height="2" fill="rgb(56,65,157)"/>
