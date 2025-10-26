@@ -465,21 +465,16 @@
   <rect x="194.5" y="30" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2" />
   <rect x="206.5" y="30" width="7" height="2" fill="rgb(56,65,157)" />
   <rect x="206.5" y="30" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2" />
-  <rect x="228" y="32" width="12" height="15" fill="rgb(57,134,191)" />
-  <line x1="228" y1="32" x2="240" y2="32" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
-  <line x1="228" y1="47" x2="240" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
+  <rect x="228" y="32" width="36" height="15" fill="rgb(57,134,191)" />
+  <line x1="228" y1="32" x2="264" y2="32" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
+  <line x1="228" y1="47" x2="264" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
   <line x1="228" y1="32" x2="228" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
-  <line x1="240" y1="32" x2="240" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
+  <line x1="264" y1="32" x2="264" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
   <rect x="230.5" y="30" width="7" height="2" fill="rgb(57,134,191)" />
   <rect x="230.5" y="30" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2" />
-  <rect x="240" y="32" width="24" height="15" fill="rgb(56,135,190)" />
-  <line x1="240" y1="32" x2="264" y2="32" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
-  <line x1="240" y1="47" x2="264" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
-  <line x1="240" y1="32" x2="240" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
-  <line x1="264" y1="32" x2="264" y2="47" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
-  <rect x="242.5" y="30" width="7" height="2" fill="rgb(56,135,190)" />
+  <rect x="242.5" y="30" width="7" height="2" fill="rgb(57,134,191)" />
   <rect x="242.5" y="30" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2" />
-  <rect x="254.5" y="30" width="7" height="2" fill="rgb(56,135,190)" />
+  <rect x="254.5" y="30" width="7" height="2" fill="rgb(57,134,191)" />
   <rect x="254.5" y="30" width="7" height="2" fill="none" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.2" />
   <rect x="300" y="32" width="36" height="15" fill="rgb(56,135,190)" />
   <line x1="300" y1="32" x2="336" y2="32" stroke="rgb(0,0,0)" stroke-width="0.5" opacity="0.3" />
